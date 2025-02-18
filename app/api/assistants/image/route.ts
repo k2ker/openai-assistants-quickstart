@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     if (!response.ok) {
       const error = await response.json();
       console.error("❌ OpenAI 파일 업로드 실패:", error);
-      return NextResponse.json(
+      return Response.json(
         { error: "File upload failed", details: error },
         { status: response.status }
       );
@@ -41,11 +41,11 @@ export async function POST(request: Request) {
     const data = await response.json();
     console.log("✅ OpenAI 파일 업로드 성공:", data);
 
-    return NextResponse.json({ success: true, fileId: data.id });
+    return Response.json({ success: true, fileId: data.id });
   } catch (error) {
     console.error("🔥 파일 업로드 API 오류 발생:", error);
 
-    return NextResponse.json(
+    return Response.json(
       { error: "Internal Server Error", details: error.message },
       { status: 500 }
     );
