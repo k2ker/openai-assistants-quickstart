@@ -96,11 +96,8 @@ const Chat = ({
       formData.append("purpose", "vision"); // 파일 목적 설정
 
       // OpenAI 파일 업로드 요청
-      const response = await fetch("https://api.openai.com/v1/files", {
+      const response = await fetch("/api/assistants/image", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_API_KEY}`,
-        },
         body: formData,
       });
 
@@ -111,7 +108,7 @@ const Chat = ({
 
       const data = await response.json();
       console.log("File uploaded successfully:", data);
-      return data.id; // 업로드된 파일의 ID 반환
+      return data.fileId; // 업로드된 파일의 ID 반환
     } catch (error) {
       console.error("Error uploading file:", error.message);
       throw error;
