@@ -27,6 +27,8 @@ export async function POST(request: Request) {
       body: openaiFormData,
     });
 
+    console.log("🔍 OpenAI API 응답 상태 코드:", response.status);
+
     if (!response.ok) {
       const error = await response.json();
       console.error("❌ OpenAI 파일 업로드 실패:", error);
