@@ -117,7 +117,7 @@ const Chat = ({
 
       const data = await response.json();
       console.log("File uploaded successfully:", data);
-      return data.fileId; // 업로드된 파일의 ID 반환
+      return data.id; // 업로드된 파일의 ID 반환
     } catch (error) {
       console.error("Error uploading file:", error.message);
       throw error;
