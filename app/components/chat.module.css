@@ -13,6 +13,10 @@
   order: 1;
 }
 
+.fileInput {
+  align-self: center;
+}
+
 .input {
   flex-grow: 1;
   padding: 16px 24px;

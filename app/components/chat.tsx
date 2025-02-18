@@ -64,6 +64,8 @@ const Chat = ({
   const [messages, setMessages] = useState([]);
   const [inputDisabled, setInputDisabled] = useState(false);
   const [threadId, setThreadId] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // automatically scroll to bottom of chat
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
@@ -86,14 +88,55 @@ const Chat = ({
     createThread();
   }, []);
 
+  const uploadFileToOpenAI = async (file) => {
+    try {
+      // FormData 생성
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("purpose", "vision"); // 파일 목적 설정
+
+      // OpenAI 파일 업로드 요청
+      const response = await fetch("https://api.openai.com/v1/files", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_API_KEY}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`File upload failed: ${error.error.message}`);
+      }
+
+      const data = await response.json();
+      console.log("File uploaded successfully:", data);
+      return data.id; // 업로드된 파일의 ID 반환
+    } catch (error) {
+      console.error("Error uploading file:", error.message);
+      throw error;
+    }
+  };
+
   const sendMessage = async (text) => {
+    const body = {
+      content: text,
+    };
+    if (file) {
+      body.content = [
+        {
+          type: "image_file",
+          image_file: {
+            file_id: await uploadFileToOpenAI(file),
+          },
+        },
+      ];
+    }
     const response = await fetch(
       `/api/assistants/threads/${threadId}/messages`,
       {
         method: "POST",
-        body: JSON.stringify({
-          content: text,
-        }),
+        body: JSON.stringify(body),
       }
     );
     const stream = AssistantStream.fromReadableStream(response.body);
@@ -125,10 +168,12 @@ const Chat = ({
     setMessages((prevMessages) => [
       ...prevMessages,
       { role: "user", text: userInput },
+      { role: "image", text: file },
     ]);
     setUserInput("");
     setInputDisabled(true);
     scrollToBottom();
+    clearFile();
   };
 
   /* Stream Event Handlers */
@@ -142,7 +187,7 @@ const Chat = ({
   const handleTextDelta = (delta) => {
     if (delta.value != null) {
       appendToLastMessage(delta.value);
-    };
+    }
     if (delta.annotations != null) {
       annotateLastMessage(delta.annotations);
     }
@@ -151,7 +196,7 @@ const Chat = ({
   // imageFileDone - show image in chat
   const handleImageFileDone = (image) => {
     appendToLastMessage(`\n![${image.file_id}](/api/files/${image.file_id})\n`);
-  }
+  };
 
   // toolCallCreated - log new tool call
   const toolCallCreated = (toolCall) => {
@@ -236,17 +281,29 @@ const Chat = ({
         ...lastMessage,
       };
       annotations.forEach((annotation) => {
-        if (annotation.type === 'file_path') {
+        if (annotation.type === "file_path") {
           updatedLastMessage.text = updatedLastMessage.text.replaceAll(
             annotation.text,
             `/api/files/${annotation.file_path.file_id}`
           );
         }
-      })
+      });
       return [...prevMessages.slice(0, -1), updatedLastMessage];
     });
-    
-  }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      setFile(e.target.files[0]);
+    }
+  };
+
+  const clearFile = () => {
+    setFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""; // 파일 입력 초기화
+    }
+  };
 
   return (
     <div className={styles.chatContainer}>
@@ -260,6 +317,13 @@ const Chat = ({
         onSubmit={handleSubmit}
         className={`${styles.inputForm} ${styles.clearfix}`}
       >
+        <input
+          className={styles.fileInput}
+          type="file"
+          accept="image/*"
+          onChange={handleFileChange}
+          ref={fileInputRef}
+        />
         <input
           type="text"
           className={styles.input}
