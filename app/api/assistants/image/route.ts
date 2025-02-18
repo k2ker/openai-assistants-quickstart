@@ -1,6 +1,5 @@
-import { NextResponse } from "next/server";
-import { openai } from "@/app/openai";
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {
   console.log("🔍 파일 업로드 요청 수신됨1");
