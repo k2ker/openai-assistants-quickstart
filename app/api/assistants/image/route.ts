@@ -8,8 +8,6 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const file = formData.get("file") as File;
 
-    console.log("🔍 파일 업로드 요청 수신됨");
-
     // OpenAI API 요청
     const openaiFormData = new FormData();
     openaiFormData.append("file", file);
@@ -18,6 +16,7 @@ export async function POST(request: Request) {
     console.log(process.env.OPENAI_API_KEY);
     console.log(openaiFormData);
 
+    console.log("🔍 파일 업로드 요청 수신됨");
     // OpenAI API 요청
     const response = await fetch("https://api.openai.com/v1/files", {
       method: "POST",
