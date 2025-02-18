@@ -94,10 +94,18 @@ const Chat = ({
       formData.append("file", file);
       formData.append("purpose", "vision");
 
-      const response = await fetch("/api/diary", {
+      // const response = await fetch("/api/diary", {
+      //   method: "POST",
+      //   headers: {
+      //     "Content-Type": "multipart/form-data", // ✅ 강제 설정
+      //   },
+      //   body: formData,
+      // });
+
+      const response = await fetch("https://api.openai.com/v1/files", {
         method: "POST",
         headers: {
-          "Content-Type": "multipart/form-data", // ✅ 강제 설정
+          Authorization: `Bearer ${process.env.NEXT_PUBLIC_OPENAI_API_KEY}`, // ✅ 서버에서 환경 변수 사용
         },
         body: formData,
       });
