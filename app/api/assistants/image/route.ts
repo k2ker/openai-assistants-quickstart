@@ -15,6 +15,9 @@ export async function POST(request: Request) {
     openaiFormData.append("file", file);
     openaiFormData.append("purpose", "vision"); // ✅ Vision 용도로 파일 업로드
 
+    console.log(process.env.OPENAI_API_KEY);
+    console.log(openaiFormData);
+
     // OpenAI API 요청
     const response = await fetch("https://api.openai.com/v1/files", {
       method: "POST",
