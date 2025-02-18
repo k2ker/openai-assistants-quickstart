@@ -98,7 +98,6 @@ const Chat = ({
       // OpenAI 파일 업로드 요청
       const response = await fetch(`/api/diary`, {
         method: "POST",
-        body: formData,
       });
 
       if (!response.ok) {
