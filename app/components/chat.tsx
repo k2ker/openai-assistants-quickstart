@@ -90,14 +90,16 @@ const Chat = ({
 
   const uploadFileToOpenAI = async (file) => {
     try {
-      // FormData 생성
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("purpose", "vision"); // 파일 목적 설정
+      formData.append("purpose", "vision");
 
-      // OpenAI 파일 업로드 요청
-      const response = await fetch(`/api/diary`, {
+      const response = await fetch("/api/diary", {
         method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data", // ✅ 강제 설정
+        },
+        body: formData,
       });
 
       if (!response.ok) {
