@@ -1,21 +1,42 @@
-export const dynamic = "force-dynamic";
-export const runtime = "nodejs";
-
 export async function POST(request: Request) {
-  console.log("🔍 [1] API 엔드포인트 호출됨 (파일 업로드)");
-  console.log("🔍 [2] 요청 메서드:", request.method);
-  console.log("🔍 [3] 요청 헤더:", request.headers);
+  console.log("🔍 [1] API 호출됨 (파일 업로드)");
 
   try {
-    const formData = await request.formData();
-    console.log("🔍 [4] FormData 처리 완료");
+    const contentType = request.headers.get("content-type") || "";
+    console.log("🔍 [2] Content-Type:", contentType);
+
+    if (!contentType.includes("multipart/form-data")) {
+      return new Response(JSON.stringify({ error: "Invalid Content-Type" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    console.log("🔍 [3] Body 읽기 시작");
+    const reader = request.body?.getReader();
+    if (!reader) {
+      return new Response(JSON.stringify({ error: "No body found" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    const chunks = [];
+    let done = false;
+    while (!done) {
+      const { value, done: readerDone } = await reader.read();
+      if (value) chunks.push(value);
+      done = readerDone;
+    }
+
+    console.log("🔍 [4] Body 읽기 완료, 총 크기:", chunks.length);
 
     return new Response(JSON.stringify({ message: "파일 업로드 성공" }), {
       status: 200,
       headers: { "Content-Type": "application/json" },
     });
   } catch (error) {
-    console.error("🔥 [ERROR] request.formData() 처리 중 오류 발생:", error);
+    console.error("🔥 [ERROR] 요청 처리 중 오류 발생:", error);
     return new Response(JSON.stringify({ error: "Internal Server Error" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
