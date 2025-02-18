@@ -3,15 +3,21 @@ import { openai } from "@/app/openai";
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
+  console.log("🔍 파일 업로드 요청 수신됨1");
   try {
     // 요청에서 FormData 가져오기
+    console.log("🔍 파일 업로드 요청 수신됨2");
     const formData = await request.formData();
     const file = formData.get("file") as File;
+    console.log("🔍 파일 업로드 요청 수신됨3");
 
     // OpenAI API 요청
     const openaiFormData = new FormData();
+    console.log("🔍 파일 업로드 요청 수신됨4");
     openaiFormData.append("file", file);
+    console.log("🔍 파일 업로드 요청 수신됨5");
     openaiFormData.append("purpose", "vision"); // ✅ Vision 용도로 파일 업로드
+    console.log("🔍 파일 업로드 요청 수신됨6");
 
     console.log(process.env.OPENAI_API_KEY);
     console.log(openaiFormData);
