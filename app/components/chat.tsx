@@ -96,7 +96,7 @@ const Chat = ({
       formData.append("purpose", "vision"); // 파일 목적 설정
 
       // OpenAI 파일 업로드 요청
-      const response = await fetch(`/api/assistants/diary`, {
+      const response = await fetch(`/api/diary`, {
         method: "POST",
         body: formData,
       });
