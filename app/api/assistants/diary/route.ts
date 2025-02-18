@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic"; // ✅ Next.js가 이 API를 정적으로 캐싱하지 않도록 설정
 export const runtime = "nodejs"; // ✅ Next.js에서 서버 실행을 명확하게 지정
 
-export async function POST(request: Request) {
+export async function POST(request) {
   console.log("🔍 [1] API 엔드포인트 호출됨");
 
   try {
