@@ -1,12 +1,24 @@
 export const dynamic = "force-dynamic"; // ✅ Next.js가 이 API를 정적으로 캐싱하지 않도록 설정
+export const runtime = "nodejs"; // ✅ Next.js에서 서버 실행을 명확하게 지정
 
 export async function POST(request: Request) {
-  console.log("🔍 파일 업로드 API 호출됨");
+  console.log("🔍 [1] API 엔드포인트 호출됨");
 
-  return new Response(JSON.stringify({ message: "파일 업로드 성공" }), {
-    status: 200,
-    headers: { "Content-Type": "application/json" },
-  });
+  try {
+    console.log("🔍 [2] 요청 헤더:", request.headers);
+    console.log("🔍 [3] 요청 메서드:", request.method);
+
+    return new Response(JSON.stringify({ message: "파일 업로드 성공" }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (error) {
+    console.error("🔥 [ERROR] API 처리 중 오류 발생:", error);
+    return new Response(JSON.stringify({ error: "Internal Server Error" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
 }
 
 // export const runtime = "nodejs";
